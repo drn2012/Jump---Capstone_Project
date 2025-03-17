@@ -5,7 +5,7 @@ import threading
 pygame.init()
 pygame.mixer.init()
 
-
+#Creates function to show text with a black background
 def showmessage(text):
     screen.fill(BLACK)
     display = font.render(text,True,WHITE)
@@ -53,14 +53,11 @@ n = [45,80,120,165,225,255,300,348,371,417,444]
 #Loop running
 running = True
 
+#Creates a score variable
 score = 0
 
-#Win and Game over
-win = False
-gameover = False
 
-
-#Font
+#Fonts
 font = pygame.font.SysFont("Arial",40)
 smallfont = pygame.font.SysFont("Courier",20)
 
@@ -105,12 +102,14 @@ class Thorn(pygame.sprite.Sprite):
         self.rect.bottom = HEIGHT
 
     def update(self):
+        #Makes score global
         global score
+
         #Moves the spike
         speed = 10
         self.rect.x -= speed
 
-        #Kill if the spike is out of screen
+        #Kill if the spike is out of screen and increases score by 10
         if self.rect.right < 0:
             score += 10
             self.kill()
@@ -120,7 +119,7 @@ class Goal(pygame.sprite.Sprite):
     def __init__(self):
         #Initializing attributes
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.transform.scale(goalimg,(100,76))
+        self.image = pygame.transform.scale(goalimg,(105,76))
         self.rect = self.image.get_rect()
         self.image.set_colorkey(BLACK)
         self.rect.left = WIDTH + 40
@@ -164,9 +163,8 @@ while running:
     #Sets the FPS
     clock.tick(FPS)
 
-    #Counts iterations if the game is not over and not won
-    if win == False and gameover == False:
-        count += 1
+    #Counts iterations
+    count += 1
 
     #Enables quitting the game
     for event in pygame.event.get():
@@ -195,22 +193,21 @@ while running:
     threading.Thread(target=ninja.update, daemon=True).start()
     excluding_player.update()
     
-
+    #Shows the score on screen
     scoredisplay = smallfont.render(f"Your score : {score}",True,BLACK)
-    screen.blit(scoredisplay ,(20,20))
+    screen.blit(scoredisplay,(20,20))
+
     #Draws the sprites
     all_sprites.draw(screen)
 
-    #Checks the collision between the player and the spikes
-    hit = pygame.sprite.spritecollide(ninja,spikes,False)
-
-    #Ends the game if the player escapes the goal
-    if hit or count > 700:
+    
+    #Ends the game if the player touches the spike
+    if pygame.sprite.spritecollide(ninja,spikes,False):
         showmessage(f"You lose! Score : {score}")
         running = False
 
     #Checks for collision between player and the goal
-    if pygame.sprite.spritecollide(ninja,goalgroup ,False):
+    if pygame.sprite.spritecollide(ninja,goalgroup,False):
         showmessage("You Won!")
         running = False
 
